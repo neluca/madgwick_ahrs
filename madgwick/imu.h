@@ -10,21 +10,23 @@
 
 #define IMU_USE_ZETA
 
-extern float imu_beta;
+extern float imu_beta;  // algorithm gain beta
 
 #ifdef IMU_USE_ZETA
-extern float imu_zeta;
+extern float imu_zeta;  // algorithm gain zeta
 #endif
 
+
 void imu_update(float *q,
-                float ax, float ay, float az,
-                float gx, float gy, float gz,
-                float dt);
+                float ax, float ay, float az, // Accelerometer (m/s2)
+                float gx, float gy, float gz, // Gyroscope (rad/s)
+                float dt);                    // Sampling time (s)
+
 
 void imu_ahrs_update(float *q,
-                     float ax, float ay, float az,
-                     float gx, float gy, float gz,
-                     float mx, float my, float mz,
-                     float dt);
+                     float ax, float ay, float az, // Accelerometer (m/s2)
+                     float gx, float gy, float gz, // Gyroscope (rad/s)
+                     float mx, float my, float mz, // Magnetometer (uT)
+                     float dt);                    // Sampling time (s)
 
 #endif  /* SRC_IMU_H */

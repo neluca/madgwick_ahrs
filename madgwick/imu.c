@@ -8,7 +8,7 @@
 #include "imu.h"
 #include "quaternion.h"
 
-float imu_beta;
+float imu_beta = 1.0f;
 
 #ifdef IMU_USE_ZETA
 float imu_zeta = 0.0f;
@@ -18,14 +18,14 @@ void imu_update(float *q, float ax, float ay, float az, float gx, float gy, floa
     Q_(q_a) = {0, ax, ay, az};
     quaternion_norm(q_a);
 
-    // Compute the objective function for gravity, equation (15),
-    // simplified to equation (25) due to the 0's in the acceleration reference quaternion
+    // Compute the objective function for gravity,
+    // simplified to equation due to the 0's in the acceleration reference quaternion
     float f[3];
     f[0] = 2.0f * (q[1] * q[3] - q[0] * q[2]) - q_a[1];
     f[1] = 2.0f * (q[0] * q[1] - q[2] * q[3]) - q_a[2];
     f[2] = 2.0f * (0.5f - q[1] * q[1] - q[2] * q[2]) - q_a[3];
 
-    // Compute the Jacobian matrix, equation (26), for gravity
+    // Compute the Jacobian matrix for gravity
     float j[3][4];
     j[0][0] = -2.0f * q[2];
     j[0][1] = 2.0f * q[3];
@@ -76,7 +76,7 @@ void imu_ahrs_update(float *q,
     Q_(q_m) = {0, mx, my, mz};
     quaternion_norm(q_m);
 
-    // Reference direction of Earth's magnetic filed
+    // Reference direction of Earth's magnetic field
     Q_(h);
     quaternion_prod(h, q, q_m);
     Q_(q_hat);
@@ -89,6 +89,7 @@ void imu_ahrs_update(float *q,
     b[2] = 0.0f;
     b[3] = h[3];
 
+    // Compute the objective function for gravity and magnetic field
     float f[6];
     f[0] = 2.0f * (q[1] * q[3] - q[0] * q[2]) - q_a[1];
     f[1] = 2.0f * (q[0] * q[1] - q[2] * q[3]) - q_a[2];
@@ -97,6 +98,7 @@ void imu_ahrs_update(float *q,
     f[4] = 2.0f * b[1] * (q[1] * q[2] - q[0] * q[3]) + 2.0f * b[3] * (q[0] * q[1] + q[2] * q[3]) - q_m[2];
     f[5] = 2.0f * b[1] * (q[0] * q[2] + q[1] * q[3]) + 2.0f * b[3] * (0.5f - q[1] * q[1] - q[2] * q[2]) - q_m[3];
 
+    // Compute the Jacobian matrix for gravity and magnetic field
     float j[6][4];
     j[0][0] = -2.0f * q[2];
     j[0][1] = 2.0f * q[3];
@@ -140,6 +142,7 @@ void imu_ahrs_update(float *q,
 
     Q_(q_g) = {0, gx, gy, gz};
 #ifdef IMU_USE_ZETA
+    // Gyroscope compensation drift
     Q_(q_tmp);
     quaternion_prod(q_tmp, q_hat, step);
     quaternion_scalar(q_tmp, 2.0f);
