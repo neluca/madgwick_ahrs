@@ -1,5 +1,7 @@
 /*
  * Copyright Yinan Liao. All rights reserved.
+ *
+ * MIT: https://github.com/neluca/madgwick_ahrs/blob/main/LICENSE
  */
 
 #ifndef SRC_QUATERNION_H
@@ -13,7 +15,7 @@ typedef float fp_t;
 #define q_asin(a)      asinf(a)
 
 // q = l * r
-static inline void quaternion_mul(fp_t *q, const fp_t *l, const fp_t *r) {
+static inline void quaternion_prod(fp_t *q, const fp_t *l, const fp_t *r) {
     q[0] = l[0] * r[0] - l[1] * r[1] - l[2] * r[2] - l[3] * r[3];
     q[1] = l[0] * r[1] + l[1] * r[0] + l[2] * r[3] - l[3] * r[2];
     q[2] = l[0] * r[2] - l[1] * r[3] + l[2] * r[0] + l[3] * r[1];
@@ -61,8 +63,9 @@ static inline void quaternion_norm(fp_t *q) {
     q[3] *= norm;
 }
 
-// euler angles
-static inline void quaternion_euler(fp_t *x, fp_t *y, fp_t *z, const fp_t *q) {
+// quaternion to euler angles
+// x: roll  y: pitch  z: yaw
+static inline void quaternion2euler(fp_t *x, fp_t *y, fp_t *z, const fp_t *q) {
     *z = q_atan2((2 * q[1] * q[2] - 2 * q[0] * q[3]), (2 * q[0] * q[0] + 2 * q[1] * q[1] - 1));
     *y = -q_asin(2 * q[1] * q[3] + 2 * q[0] * q[2]);
     *x = q_atan2((2 * q[2] * q[3] - 2 * q[0] * q[1]), (2 * q[0] * q[0] + 2 * q[3] * q[3] - 1));
