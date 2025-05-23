@@ -50,17 +50,17 @@ void imu_update(float *q, float ax, float ay, float az, float gx, float gy, floa
     step[3] = j[0][3] * f[0] + j[1][3] * f[1] + j[2][3] * f[2];
 
     quaternion_norm(step);
-    quaternion_scalar(step, imu_beta);
+    quaternion_scale(step, imu_beta);
 
     // Compute rate of change of quaternion
     Q_(q_g) = {0, gx, gy, gz};
     Q_(q_dot);
     quaternion_prod(q_dot, q, q_g);
-    quaternion_scalar(q_dot, 0.5f);
+    quaternion_scale(q_dot, 0.5f);
     quaternion_sub(q_dot, step);
 
     // Integrate to yield quaternion
-    quaternion_scalar(q_dot, dt);
+    quaternion_scale(q_dot, dt);
     quaternion_add(q, q_dot);
     quaternion_norm(q);
 }
@@ -138,27 +138,27 @@ void imu_ahrs_update(float *q,
     step[3] = j[0][3] * f[0] + j[1][3] * f[1] + j[2][3] * f[2] + j[3][3] * f[3] + j[4][3] * f[4] + j[5][3] * f[5];
 
     quaternion_norm(step);
-    quaternion_scalar(step, imu_beta);
+    quaternion_scale(step, imu_beta);
 
     Q_(q_g) = {0, gx, gy, gz};
 #ifdef IMU_USE_ZETA
     // Gyroscope compensation drift
     Q_(q_tmp);
     quaternion_prod(q_tmp, q_hat, step);
-    quaternion_scalar(q_tmp, 2.0f);
-    quaternion_scalar(q_tmp, dt);
-    quaternion_scalar(q_tmp, imu_zeta);
+    quaternion_scale(q_tmp, 2.0f);
+    quaternion_scale(q_tmp, dt);
+    quaternion_scale(q_tmp, imu_zeta);
     quaternion_sub(q_g, q_tmp);
 #endif
 
     // Compute rate of change of quaternion
     Q_(q_dot);
     quaternion_prod(q_dot, q, q_g);
-    quaternion_scalar(q_dot, 0.5f);
+    quaternion_scale(q_dot, 0.5f);
     quaternion_sub(q_dot, step);
 
     // Integrate to yield quaternion
-    quaternion_scalar(q_dot, dt);
+    quaternion_scale(q_dot, dt);
     quaternion_add(q, q_dot);
     quaternion_norm(q);
 }

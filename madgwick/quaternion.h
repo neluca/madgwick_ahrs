@@ -39,7 +39,7 @@ static inline void quaternion_sub(fp_t *q, const fp_t *r) {
 }
 
 // scalar multiplication : q *= n
-static inline void quaternion_scalar(fp_t *q, fp_t n) {
+static inline void quaternion_scale(fp_t *q, fp_t n) {
     q[0] *= n;
     q[1] *= n;
     q[2] *= n;
